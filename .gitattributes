@@ -1,2 +1,82 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+package task1;
+
+import java.util.Random;
+import java.util.Scanner;
+
+class FileLogger{
+	final int MAX_BACKUP=5;
+}
+
+
+public class Driver {
+
+	private static Scanner sc = new Scanner(System.in);
+	private static final Random random = new Random ();
+	
+	public static void main(String[] args) {
+		
+		double cap;
+		int [] third_sensor=new int [3];
+		
+		System.out.println("please enter the cap of the temp: ");
+		cap= sc.nextDouble();
+		
+		double temperature= generateTemperature(cap);
+		System.out.println( "the randomnly generated temperature is: " +temperature); 
+		
+		
+		double humidity = generateHumidity();
+		System.out.println("the randomnly generated humidity is: "+humidity);
+
+		
+		for(int i=0; i<third_sensor.length ; i++) {
+			third_sensor[i] = generateThirdSensor();
+			System.out.println("value "+ i +" of third sensor is "+third_sensor[i]);
+			int majorityValue = MajorityVoter(third_sensor);
+			if (majorityValue != -1) {
+			    System.out.println("Majority voted value from third_sensor: " + majorityValue);
+			} else {
+			    System.out.println("No majority found in third_sensor values.");
+			}
+
+		}
+		
+		
+		
+		
+		
+	}
+
+	
+	
+	
+	private static int generateThirdSensor() {
+		return (int) (random.nextDouble()*10);
+	}
+	
+	
+	private static double generateHumidity() {
+	return random.nextDouble();
+	}
+	
+	
+	private static double generateTemperature(double cap) {
+	return random.nextDouble()*cap; 
+	}
+	
+	private static int MajorityVoter(int [] third_sensor) {
+		int[] count = new int[10]; 
+
+        for (int value : third_sensor) {
+            count[(int) value]++;
+        }
+
+        for (int i = 0; i < count.length; i++) {
+            if (count[i] >= 2) {
+                return i;
+            }
+        }
+
+        return -1;
+	}
+}
