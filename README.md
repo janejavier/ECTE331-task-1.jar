@@ -110,3 +110,68 @@ public class Driver {
         return -1;
     }
 }
+
+//file_logger
+package task1;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
+
+public class File_Logger {
+
+    private final String mainLogName;
+    private static final int MAX_ATTEMPTS = 5;
+    private final Random random = new Random();
+
+    public File_Logger(String fileName) {
+        this.mainLogName = fileName;
+    }
+
+    
+    public void log(String entry) {
+        String timeStamp = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String formattedEntry = "[" + timeStamp + "] " + entry;
+
+        boolean loggedSuccessfully = writeToFile(mainLogName, formattedEntry);
+
+   
+        for (int i = 1; !loggedSuccessfully && i <= MAX_ATTEMPTS; i++) {
+            String backupFile = mainLogName.replace(".txt", i + ".txt");
+            loggedSuccessfully = writeToFile(backupFile, formattedEntry);
+        }
+
+     
+        if (!loggedSuccessfully) {
+            try (FileWriter fallbackWriter = new FileWriter("principal_log.txt", true)) {
+                fallbackWriter.write("!!! Could not log entry: " + formattedEntry + "\n");
+            } catch (IOException err) {
+                System.err.println("ERROR: Logging completely failed — principal_log.txt inaccessible.");
+            }
+        }
+    }
+
+   
+    private boolean writeToFile(String fileName, String message) {
+        try {
+            if (random.nextInt(100) < 40) {
+                throw new IOException("Mock failure writing to file.");
+            }
+
+            try (FileWriter writer = new FileWriter(fileName, true)) {
+                writer.write(message + "\n");
+            }
+
+            System.out.println("Log saved to " + fileName);
+            return true;
+
+        } catch (IOException ex) {
+            System.out.println("Could not write to " + fileName + ": " + ex.getMessage());
+            return false;
+        }
+    }
+}
+
